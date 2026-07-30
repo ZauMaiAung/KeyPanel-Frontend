@@ -161,10 +161,8 @@ function switchTab(tabName) {
     if (tabName === "admin") loadAdminUsers();
 }
 
-// ပြင်ဆင်ထားသော loadHistory function
 async function loadHistory() {
     try {
-        // currentUserRole က admin ဖြစ်နေရင် All Admin Keys API ကို ခေါ်မည်
         const endpoint = (currentUserRole === "admin") 
             ? `${API_BASE}/admin/keys` 
             : `${API_BASE}/keys/history/${currentUser}`;
@@ -234,3 +232,32 @@ async function adminAddBalance() {
         alert("Failed to connect to backend server");
     }
 }
+
+async function verifyBinancePayment() {
+    const txnId = document.getElementById("binance-txn-id").value.trim();
+
+    if (!txnId) {
+        return alert("Please enter Binance Transaction ID");
+    }
+
+    try {
+        const res = await fetch(`${API_BASE}/payment/binance/verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: currentUser, txn_id: txnId })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert(data.message || "Topup successful!");
+            document.getElementById("binance-txn-id").value = "";
+            fetchUserData();
+        } else {
+            alert(data.detail || "Payment verification failed!");
+        }
+    } catch (err) {
+        alert("Failed to connect to backend server");
+    }
+}
+

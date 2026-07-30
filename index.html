@@ -8,7 +8,7 @@
 </head>
 <body>
 
-        <div id="login-screen" class="card">
+    <div id="login-screen" class="card">
         <h2 id="auth-title">Welcome Back</h2>
         <p class="subtitle" id="auth-subtitle">Please sign in to access your dashboard.</p>
 
@@ -29,12 +29,11 @@
         </p>
     </div>
 
-
     <div id="dashboard-screen" class="hidden">
         <div class="header-card">
             <div>
                 <span class="reseller-label">Reseller Dashboard</span>
-                <h3 id="user-display">alphadaaxy Dashboard</h3>
+                <h3 id="user-display">Dashboard</h3>
             </div>
             <div class="balance-box">
                 <span>Balance: <strong id="user-balance">$0.00</strong></span>
@@ -45,11 +44,11 @@
 
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('generator')">KEY GENERATOR</button>
+            <button class="tab-btn" onclick="switchTab('topup')" style="color: #00f5d4; border-color: #00f5d4;">TOP UP</button>
             <button class="tab-btn" onclick="switchTab('downloads')">DOWNLOADS</button>
             <button class="tab-btn" onclick="switchTab('tutorials')">TUTORIALS</button>
             <button class="tab-btn" onclick="switchTab('keys')">LICENSE KEYS</button>
             <button id="admin-tab-btn" class="tab-btn" onclick="switchTab('admin')" style="border-color: #ff4757; color: #ff4757; display: none;">ADMIN</button>
-
         </div>
     
         <div id="tab-generator" class="tab-content card">
@@ -72,6 +71,20 @@
                 <h5>Generated Keys:</h5>
                 <textarea id="key-output" readonly rows="4"></textarea>
             </div>
+        </div>
+
+        <div id="tab-topup" class="tab-content card hidden">
+            <h4 style="color: #00f5d4;">Top Up Balance (Binance Pay)</h4>
+            <p style="font-size: 12px; color: #a0aab2; margin-bottom: 15px;">
+                Send USDT via Binance Pay to your account and submit the Transaction ID below for instant topup.
+            </p>
+
+            <div class="form-group">
+                <label>Binance Transaction ID / Order ID</label>
+                <input type="text" id="binance-txn-id" placeholder="e.g. 214829302194">
+            </div>
+
+            <button class="btn btn-primary" style="background: #00f5d4; color: #0b132b;" onclick="verifyBinancePayment()">Verify Payment</button>
         </div>
 
         <div id="tab-downloads" class="tab-content card hidden">
@@ -100,35 +113,36 @@
                 </tbody>
             </table>
         </div>
-<div id="tab-admin" class="tab-content card hidden">
-    <h4 style="color: #ff4757;">Admin Control Panel</h4>
-    <div style="background: #0b132b; padding: 12px; border-radius: 8px; margin: 15px 0;">
-        <h5 style="color: #48cae4; margin-bottom: 10px;">Add Balance to Reseller</h5>
-        <div class="form-group">
-            <label>Reseller Username</label>
-            <input type="text" id="admin-topup-user" placeholder="Target Username">
-        </div>
-        <div class="form-group">
-            <label>Amount ($)</label>
-            <input type="number" id="admin-topup-amount" value="50">
-        </div>
-        <button class="btn btn-primary" onclick="adminAddBalance()">Add Balance</button>
-    </div>
-    <h5 style="color: #48cae4; margin-bottom: 8px;">All Resellers</h5>
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>User</th>
-                <th>Balance</th>
-            </tr>
-        </thead>
-        <tbody id="admin-users-table">
-            <tr><td colspan="3">Loading...</td></tr>
-        </tbody>
-    </table>
-</div>
 
+        <div id="tab-admin" class="tab-content card hidden">
+            <h4 style="color: #ff4757;">Admin Control Panel</h4>
+            <div style="background: #0b132b; padding: 12px; border-radius: 8px; margin: 15px 0;">
+                <h5 style="color: #48cae4; margin-bottom: 10px;">Add Balance to Reseller</h5>
+                <div class="form-group">
+                    <label>Reseller Username</label>
+                    <input type="text" id="admin-topup-user" placeholder="Target Username">
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="admin-topup-amount" value="50">
+                </div>
+                <button class="btn btn-primary" onclick="adminAddBalance()">Add Balance</button>
+            </div>
+            <h5 style="color: #48cae4; margin-bottom: 8px;">All Resellers</h5>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-users-table">
+                    <tr><td colspan="3">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
