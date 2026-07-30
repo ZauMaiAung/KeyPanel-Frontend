@@ -23,9 +23,9 @@
 
         <button id="auth-btn" class="btn btn-primary" onclick="handleAuth()">Sign In</button>
         
-        <p style="text-align: center; font-size: 12px; margin-top: 15px; color: #a0aab2;">
+        <p class="auth-toggle-text">
             <span id="toggle-text">Don't have an account?</span> 
-            <a href="#" id="toggle-link" onclick="toggleAuthMode()" style="color: #00b4d8; text-decoration: none; font-weight: bold;">Sign Up</a>
+            <a href="#" id="toggle-link" class="auth-toggle-link" onclick="toggleAuthMode()">Sign Up</a>
         </p>
     </div>
 
@@ -44,13 +44,14 @@
 
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('generator')">KEY GENERATOR</button>
-            <button class="tab-btn" onclick="switchTab('topup')" style="color: #00f5d4; border-color: #00f5d4;">TOP UP</button>
+            <button class="tab-btn tab-btn-topup" onclick="switchTab('topup')">TOP UP</button>
             <button class="tab-btn" onclick="switchTab('downloads')">DOWNLOADS</button>
             <button class="tab-btn" onclick="switchTab('tutorials')">TUTORIALS</button>
             <button class="tab-btn" onclick="switchTab('keys')">LICENSE KEYS</button>
-            <button id="admin-tab-btn" class="tab-btn" onclick="switchTab('admin')" style="border-color: #ff4757; color: #ff4757; display: none;">ADMIN</button>
+            <button id="admin-tab-btn" class="tab-btn tab-btn-admin" onclick="switchTab('admin')">ADMIN</button>
         </div>
     
+        <!-- Key Generator Tab -->
         <div id="tab-generator" class="tab-content card">
             <h4>Key Generator</h4>
             <div class="form-group">
@@ -73,30 +74,49 @@
             </div>
         </div>
 
+        <!-- Top Up / Payment Tab -->
         <div id="tab-topup" class="tab-content card hidden">
-            <h4 style="color: #00f5d4;">Top Up Balance (Binance Pay)</h4>
-            <p style="font-size: 12px; color: #a0aab2; margin-bottom: 15px;">
-                Send USDT via Binance Pay to your account and submit the Transaction ID below for instant topup.
-            </p>
-
-            <div class="form-group">
-                <label>Binance Transaction ID / Order ID</label>
-                <input type="text" id="binance-txn-id" placeholder="e.g. 214829302194">
+            <h4 class="title-cyan">Top Up Balance (Binance Pay / USDT)</h4>
+            
+            <!-- Step 1: Payment Info -->
+            <div class="payment-box">
+                <h5 class="title-blue">Step 1: Send USDT</h5>
+                
+                <!-- QR Code Image -->
+                <img src="qr-code.png" alt="Binance QR Code" class="qr-image" onerror="this.style.display='none'">
+                
+                <div class="payment-details">
+                    <p>🔹 <strong>Binance Pay ID:</strong> <span class="pay-id-text">YOUR_BINANCE_PAY_ID</span></p>
+                    <p>🔹 <strong>USDT Wallet Address:</strong></p>
+                    <input type="text" class="copy-input" value="YOUR_USDT_WALLET_ADDRESS" readonly onclick="this.select(); document.execCommand('copy'); alert('Address Copied!');">
+                </div>
             </div>
 
-            <button class="btn btn-primary" style="background: #00f5d4; color: #0b132b;" onclick="verifyBinancePayment()">Verify Payment</button>
+            <!-- Step 2: Input Txn ID & Verify -->
+            <div class="step-two-container">
+                <h5 class="subheading">Step 2: Enter Txn ID to Verify</h5>
+                <div class="form-group">
+                    <label>Binance Transaction ID / Order ID</label>
+                    <input type="text" id="binance-txn-id" placeholder="e.g. 214829302194">
+                </div>
+
+                <button class="btn btn-cyan" onclick="verifyBinancePayment()">Verify & Add Balance</button>
+            </div>
         </div>
 
+        <!-- Downloads Tab -->
         <div id="tab-downloads" class="tab-content card hidden">
             <h4>Downloads</h4>
             <p>No downloads available at the moment.</p>
         </div>
 
+        <!-- Tutorials Tab -->
         <div id="tab-tutorials" class="tab-content card hidden">
             <h4>Tutorials</h4>
             <p>Select a product to view its tutorial.</p>
         </div>
 
+        <!-- License Keys History Tab -->
         <div id="tab-keys" class="tab-content card hidden">
             <h4>Generated License Keys</h4>
             <table class="data-table">
@@ -114,10 +134,11 @@
             </table>
         </div>
 
+        <!-- Admin Control Panel Tab -->
         <div id="tab-admin" class="tab-content card hidden">
-            <h4 style="color: #ff4757;">Admin Control Panel</h4>
-            <div style="background: #0b132b; padding: 12px; border-radius: 8px; margin: 15px 0;">
-                <h5 style="color: #48cae4; margin-bottom: 10px;">Add Balance to Reseller</h5>
+            <h4 class="title-red">Admin Control Panel</h4>
+            <div class="admin-box">
+                <h5 class="title-blue">Add Balance to Reseller</h5>
                 <div class="form-group">
                     <label>Reseller Username</label>
                     <input type="text" id="admin-topup-user" placeholder="Target Username">
@@ -128,7 +149,7 @@
                 </div>
                 <button class="btn btn-primary" onclick="adminAddBalance()">Add Balance</button>
             </div>
-            <h5 style="color: #48cae4; margin-bottom: 8px;">All Resellers</h5>
+            <h5 class="subheading">All Resellers</h5>
             <table class="data-table">
                 <thead>
                     <tr>

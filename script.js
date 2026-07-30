@@ -260,4 +260,3 @@ async function verifyBinancePayment() {
         alert("Failed to connect to backend server");
     }
 }
-
