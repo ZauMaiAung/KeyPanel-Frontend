@@ -161,9 +161,15 @@ function switchTab(tabName) {
     if (tabName === "admin") loadAdminUsers();
 }
 
+// ပြင်ဆင်ထားသော loadHistory function
 async function loadHistory() {
     try {
-        const res = await fetch(`${API_BASE}/keys/history/${currentUser}`);
+        // currentUserRole က admin ဖြစ်နေရင် All Admin Keys API ကို ခေါ်မည်
+        const endpoint = (currentUserRole === "admin") 
+            ? `${API_BASE}/admin/keys` 
+            : `${API_BASE}/keys/history/${currentUser}`;
+
+        const res = await fetch(endpoint);
         const data = await res.json();
         const tbody = document.getElementById("history-table-body");
         
