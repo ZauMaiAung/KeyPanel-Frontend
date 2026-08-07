@@ -1,158 +1,43 @@
-* { 
-    box-sizing: border-box; 
-    margin: 0; 
-    padding: 0; 
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-}
-
-body { 
-    background-color: #0b132b; 
-    color: #ffffff; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    min-height: 100vh; 
-    padding: 15px; 
-}
-
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background-color: #0b132b; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
 .hidden { display: none !important; }
 
-/* Dashboard Screen Layout */
-#dashboard-screen {
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-}
+#dashboard-screen { width: 100%; max-width: 520px; margin: 0 auto; }
+.card { background: #1c2541; padding: 25px; border-radius: 12px; width: 100%; max-width: 520px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #3a506b; }
+.header-card { background: #1c2541; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #3a506b; display: flex; justify-content: space-between; align-items: center; }
 
-.card { 
-    background: #1c2541; 
-    padding: 25px; 
-    border-radius: 12px; 
-    width: 100%; 
-    max-width: 480px; 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
-    border: 1px solid #3a506b; 
-}
-
-.header-card { 
-    background: #1c2541; 
-    padding: 15px; 
-    border-radius: 12px; 
-    margin-bottom: 15px; 
-    border: 1px solid #3a506b; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-}
-
-/* Headings & Text Styles */
 h2 { font-size: 20px; color: #48cae4; text-align: center; margin-bottom: 5px; }
 h4 { color: #ffffff; margin-bottom: 10px; }
 .subtitle { font-size: 13px; color: #a0aab2; text-align: center; margin-bottom: 20px; }
 .auth-toggle-text { text-align: center; font-size: 12px; margin-top: 15px; color: #a0aab2; }
 .auth-toggle-link { color: #00b4d8; text-decoration: none; font-weight: bold; }
-.reseller-label { font-size: 11px; color: #a0aab2; }
+.reseller-label { font-size: 11px; color: #00f5d4; font-weight: bold; }
 .balance-box strong { color: #00f5d4; }
 
-/* Form Controls */
 .form-group { margin-bottom: 15px; }
 .form-group label { display: block; font-size: 13px; color: #90e0ef; margin-bottom: 5px; }
-input, select, textarea { 
-    width: 100%; 
-    padding: 10px; 
-    background: #0b132b; 
-    border: 1px solid #3a506b; 
-    color: #fff; 
-    border-radius: 6px; 
-    outline: none; 
-}
+input, select, textarea { width: 100%; padding: 10px; background: #0b132b; border: 1px solid #3a506b; color: #fff; border-radius: 6px; outline: none; }
 
-/* Buttons */
 .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
 .btn-primary { background: #00b4d8; color: #fff; }
-.btn-danger { background: #e63946; color: #fff; width: auto; padding: 6px 12px; }
+.btn-danger { background: #e63946; color: #fff; }
 .btn-cyan { background: #00f5d4; color: #0b132b; font-weight: bold; }
-.icon-btn { background: none; border: none; font-size: 16px; cursor: pointer; color: #fff; margin: 0 5px; }
+.btn-group { display: flex; gap: 10px; }
 
-/* Tabs Layout */
-.tabs { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 6px; 
-    margin-bottom: 15px; 
-}
-.tab-btn { 
-    flex: 1 1 auto; 
-    min-width: 70px; 
-    padding: 8px 5px; 
-    background: #1c2541; 
-    border: 1px solid #3a506b; 
-    color: #a0aab2; 
-    border-radius: 6px; 
-    cursor: pointer; 
-    font-size: 11px; 
-    text-align: center; 
-    white-space: nowrap; 
-}
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
+.tab-btn { flex: 1 1 auto; padding: 8px 5px; background: #1c2541; border: 1px solid #3a506b; color: #a0aab2; border-radius: 6px; cursor: pointer; font-size: 11px; text-align: center; }
 .tab-btn.active { background: #00b4d8; color: #fff; font-weight: bold; }
 .tab-btn-topup { color: #00f5d4; border-color: #00f5d4; }
 .tab-btn-admin { border-color: #ff4757; color: #ff4757; display: none; }
 
-/* Step Payment Cards (Topup & Admin) */
 .title-cyan { color: #00f5d4; }
 .title-red { color: #ff4757; }
 .title-blue { color: #48cae4; margin-bottom: 10px; }
-.subheading { color: #48cae4; margin-bottom: 8px; }
+.subheading { color: #48cae4; margin-bottom: 8px; margin-top: 10px; }
 
-.payment-box {
-    background: #0b132b;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #3a506b;
-    margin-top: 10px;
-    text-align: center;
-}
+.admin-box { background: #0b132b; padding: 12px; border-radius: 8px; margin: 15px 0; border: 1px solid #3a506b; }
+.checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-size: 12px; color: #90e0ef; }
 
-.admin-box {
-    background: #0b132b;
-    padding: 12px;
-    border-radius: 8px;
-    margin: 15px 0;
-}
-
-.qr-image {
-    width: 150px;
-    height: 150px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    border: 2px solid #00f5d4;
-}
-
-.payment-details {
-    text-align: left;
-    font-size: 13px;
-    color: #a0aab2;
-    line-height: 1.8;
-}
-
-.pay-id-text {
-    color: #00f5d4;
-    font-size: 14px;
-}
-
-.copy-input {
-    font-size: 11px;
-    color: #00f5d4;
-    background: #1c2541;
-    margin-top: 2px;
-    text-align: center;
-}
-
-.step-two-container {
-    margin-top: 15px;
-}
-
-/* Data Tables */
 .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
 .data-table th, .data-table td { border: 1px solid #3a506b; padding: 8px; text-align: left; }
 .data-table th { background: #0b132b; color: #48cae4; }

@@ -1,4 +1,4 @@
-const API_URL = "https://keypanel-backend-8y1x.onrender.com";
+const API_URL = "https://keypanel-backend-8y1x.onrender.com"; 
 const API_BASE = `${API_URL}/api/v1`;
 
 let isRegisterMode = false;
@@ -8,44 +8,34 @@ let productsData = [];
 
 function toggleAuthMode() {
     isRegisterMode = !isRegisterMode;
-    if (isRegisterMode) {
-        document.getElementById("auth-title").innerText = "Create Account";
-        document.getElementById("auth-subtitle").innerText = "Register as a new reseller";
-        document.getElementById("auth-btn").innerText = "Sign Up";
-        document.getElementById("toggle-text").innerText = "Already have an account?";
-        document.getElementById("toggle-link").innerText = "Sign In";
-    } else {
-        document.getElementById("auth-title").innerText = "Welcome Back";
-        document.getElementById("auth-subtitle").innerText = "Please sign in to access your dashboard.";
-        document.getElementById("auth-btn").innerText = "Sign In";
-        document.getElementById("toggle-text").innerText = "Don't have an account?";
-        document.getElementById("toggle-link").innerText = "Sign Up";
-    }
+    document.getElementById("auth-title").innerText = isRegisterMode ? "Create Account" : "Welcome Back";
+    document.getElementById("auth-btn").innerText = isRegisterMode ? "Sign Up" : "Sign In";
+    document.getElementById("toggle-link").innerText = isRegisterMode ? "Sign In" : "Sign Up";
+    document.getElementById("referral-group").classList.toggle("hidden", !isRegisterMode);
 }
 
 async function handleAuth() {
     const user = document.getElementById("login-username").value.trim();
     const pass = document.getElementById("login-password").value.trim();
+    const ref = document.getElementById("login-referral").value.trim();
 
-    if (!user || !pass) return alert("Please fill in username and password");
+    if (!user || !pass) return alert("Fill in username and password");
 
     const endpoint = isRegisterMode ? "/register" : "/login";
+    const bodyData = isRegisterMode ? { username: user, password: pass, referral_code: ref } : { username: user, password: pass };
 
     try {
         const res = await fetch(`${API_BASE}${endpoint}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: user, password: pass })
+            body: JSON.stringify(bodyData)
         });
 
         const data = await res.json();
-
-        if (!res.ok) {
-            return alert(data.detail || "Authentication failed");
-        }
+        if (!res.ok) return alert(data.detail || "Auth Failed");
 
         if (isRegisterMode) {
-            alert("Account created successfully! Please Sign In.");
+            alert("Account created! Please Sign In.");
             toggleAuthMode();
         } else {
             currentUser = data.username;
@@ -53,10 +43,12 @@ async function handleAuth() {
 
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("dashboard-screen").classList.remove("hidden");
-            document.getElementById("user-display").innerText = `${currentUser} Dashboard`;
+            document.getElementById("user-display").innerText = `${currentUser}`;
+            document.getElementById("role-badge").innerText = `${currentUserRole.toUpperCase()} DASHBOARD`;
 
-            if (currentUserRole === "admin") {
+            if (["admin", "owner"].includes(currentUserRole)) {
                 document.getElementById("admin-tab-btn").style.display = "inline-block";
+                loadModConfig();
             } else {
                 document.getElementById("admin-tab-btn").style.display = "none";
             }
@@ -65,54 +57,36 @@ async function handleAuth() {
             await loadProducts();
         }
     } catch (err) {
-        alert("Server error. Make sure Backend API is running.");
+        alert("Backend API connection failed.");
     }
 }
 
-function logout() {
-    location.reload();
-}
+function logout() { location.reload(); }
 
 async function fetchUserData() {
     try {
         const res = await fetch(`${API_BASE}/user/${currentUser}`);
         const data = await res.json();
-        if (data.balance === "Unlimited" || currentUserRole === "admin") {
-            document.getElementById("user-balance").innerText = "Unlimited";
-        } else {
-            document.getElementById("user-balance").innerText = `$${parseFloat(data.balance).toFixed(2)}`;
-        }
-    } catch (err) {
-        console.error("Error fetching user data:", err);
-    }
+        document.getElementById("user-balance").innerText = (data.balance === "Unlimited") ? "Unlimited" : `$${parseFloat(data.balance).toFixed(2)}`;
+    } catch (err) { console.error(err); }
 }
 
 async function loadProducts() {
     try {
         const res = await fetch(`${API_BASE}/products`);
         productsData = await res.json();
-        
         const prodSelect = document.getElementById("product-select");
         if (productsData.length > 0) {
             prodSelect.innerHTML = productsData.map(p => `<option value="${p.id}">${p.name}</option>`).join("");
             updatePlans();
-        } else {
-            prodSelect.innerHTML = `<option value="">No products available</option>`;
         }
-    } catch (err) {
-        console.error("Error loading products:", err);
-    }
+    } catch (err) { console.error(err); }
 }
 
 function updatePlans() {
     const prodId = parseInt(document.getElementById("product-select").value);
     const prod = productsData.find(p => p.id === prodId);
-    const planSelect = document.getElementById("plan-select");
-    if (prod && prod.plans && prod.plans.length > 0) {
-        planSelect.innerHTML = prod.plans.map(pl => `<option value="${pl.id}">${pl.name} - $${pl.price.toFixed(2)}</option>`).join("");
-    } else {
-        planSelect.innerHTML = `<option value="">No plans available</option>`;
-    }
+    document.getElementById("plan-select").innerHTML = prod?.plans.map(pl => `<option value="${pl.id}">${pl.name} - $${pl.price.toFixed(2)}</option>`).join("") || "";
 }
 
 async function generateKeys() {
@@ -120,143 +94,124 @@ async function generateKeys() {
     const planId = parseInt(document.getElementById("plan-select").value);
     const quantity = parseInt(document.getElementById("key-quantity").value) || 1;
 
-    if (!productId || !planId) return alert("Please select a product and plan");
-
     try {
         const res = await fetch(`${API_BASE}/keys/generate`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: currentUser, product_id: productId, plan_id: planId, quantity: quantity })
+            body: JSON.stringify({ username: currentUser, product_id: productId, plan_id: planId, quantity })
         });
-
         const data = await res.json();
         if (res.ok) {
-            if (data.new_balance === "Unlimited" || currentUserRole === "admin") {
-                document.getElementById("user-balance").innerText = "Unlimited";
-            } else {
-                document.getElementById("user-balance").innerText = `$${parseFloat(data.new_balance).toFixed(2)}`;
-            }
-
             document.getElementById("result-box").classList.remove("hidden");
             document.getElementById("key-output").value = data.keys.join("\n");
-            loadHistory();
-        } else {
-            alert(data.detail || "Error generating keys");
-        }
-    } catch (err) {
-        alert("Failed to generate keys. Check server connection.");
-    }
+            fetchUserData();
+        } else { alert(data.detail); }
+    } catch (err) { alert("Failed to generate keys."); }
 }
 
 function switchTab(tabName) {
     document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
     document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
-    
     document.getElementById(`tab-${tabName}`).classList.remove("hidden");
-    if (event && event.target) {
-        event.target.classList.add("active");
-    }
+    if (event?.target) event.target.classList.add("active");
 
     if (tabName === "keys") loadHistory();
     if (tabName === "admin") loadAdminUsers();
 }
 
 async function loadHistory() {
-    try {
-        const endpoint = (currentUserRole === "admin") 
-            ? `${API_BASE}/admin/keys` 
-            : `${API_BASE}/keys/history/${currentUser}`;
+    const endpoint = ["admin", "owner"].includes(currentUserRole) ? `${API_BASE}/admin/keys` : `${API_BASE}/keys/history/${currentUser}`;
+    const res = await fetch(endpoint);
+    const data = await res.json();
+    document.getElementById("history-table-body").innerHTML = data.map(i => `
+        <tr>
+            <td>${i.product}</td>
+            <td>${i.plan}</td>
+            <td style="color:#00f5d4">${i.key}</td>
+            <td>${i.date}</td>
+        </tr>
+    `).join("") || "<tr><td colspan='4'>No Keys Found</td></tr>";
+}
 
-        const res = await fetch(endpoint);
-        const data = await res.json();
-        const tbody = document.getElementById("history-table-body");
-        
-        if (!data || data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4">No license keys generated yet.</td></tr>`;
-            return;
-        }
+async function updatePassword() {
+    const old_password = document.getElementById("old-pass").value;
+    const new_password = document.getElementById("new-pass").value;
 
-        tbody.innerHTML = data.map(item => `
-            <tr>
-                <td>${item.product}</td>
-                <td>${item.plan}</td>
-                <td style="color:#00f5d4">${item.key}</td>
-                <td>${item.date}</td>
-            </tr>
-        `).join("");
-    } catch (err) {
-        console.error("Error loading history:", err);
+    const res = await fetch(`${API_BASE}/user/change-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: currentUser, old_password, new_password })
+    });
+    const data = await res.json();
+    alert(data.message || data.detail);
+}
+
+/* Owner & Admin Features */
+async function loadModConfig() {
+    const res = await fetch(`${API_BASE}/mod/config`);
+    const data = await res.json();
+    if (data.mod_name) {
+        document.getElementById("mod-name-input").value = data.mod_name;
+        document.getElementById("mod-status-select").value = data.mod_status;
+        document.getElementById("check-maintenance").checked = data.is_maintenance;
+        document.getElementById("check-esp").checked = data.features.esp;
+        document.getElementById("check-aimbot").checked = data.features.aimbot;
+        document.getElementById("check-bullet").checked = data.features.bullet_track;
+        document.getElementById("check-memory").checked = data.features.memory;
     }
 }
 
+async function saveModConfig() {
+    const payload = {
+        username: currentUser,
+        mod_name: document.getElementById("mod-name-input").value,
+        mod_status: document.getElementById("mod-status-select").value,
+        is_maintenance: document.getElementById("check-maintenance").checked,
+        esp_enabled: document.getElementById("check-esp").checked,
+        aimbot_enabled: document.getElementById("check-aimbot").checked,
+        bullet_track_enabled: document.getElementById("check-bullet").checked,
+        memory_enabled: document.getElementById("check-memory").checked
+    };
+
+    const res = await fetch(`${API_BASE}/mod/config`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    alert(data.message || "Updated!");
+}
+
+async function cleanKeys(clean_type) {
+    const res = await fetch(`${API_BASE}/admin/keys/clean`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: currentUser, clean_type })
+    });
+    const data = await res.json();
+    alert(data.message);
+}
+
 async function loadAdminUsers() {
-    try {
-        const res = await fetch(`${API_BASE}/admin/users`);
-        const users = await res.json();
-        const tbody = document.getElementById("admin-users-table");
-        
-        tbody.innerHTML = users.map(u => `
-            <tr>
-                <td>${u.id}</td>
-                <td style="color:#00f5d4">${u.username}</td>
-                <td>$${parseFloat(u.balance).toFixed(2)}</td>
-            </tr>
-        `).join("");
-    } catch (err) {
-        console.error("Error loading admin users:", err);
-    }
+    const res = await fetch(`${API_BASE}/admin/users`);
+    const users = await res.json();
+    document.getElementById("admin-users-table").innerHTML = users.map(u => `
+        <tr>
+            <td>${u.id}</td>
+            <td style="color:#00f5d4">${u.username}</td>
+            <td>${u.role}</td>
+            <td>$${parseFloat(u.balance).toFixed(2)}</td>
+        </tr>
+    `).join("");
 }
 
 async function adminAddBalance() {
     const username = document.getElementById("admin-topup-user").value.trim();
     const amount = parseFloat(document.getElementById("admin-topup-amount").value);
-
-    if (!username || isNaN(amount)) return alert("Please fill all fields with valid data");
-
-    try {
-        const res = await fetch(`${API_BASE}/admin/topup`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: username, amount: amount })
-        });
-
-        if (res.ok) {
-            alert(`Added $${amount} to ${username}`);
-            loadAdminUsers();
-            fetchUserData();
-        } else {
-            const errData = await res.json();
-            alert(errData.detail || "User not found!");
-        }
-    } catch (err) {
-        alert("Failed to connect to backend server");
-    }
-}
-
-async function verifyBinancePayment() {
-    const txnId = document.getElementById("binance-txn-id").value.trim();
-
-    if (!txnId) {
-        return alert("Please enter Binance Transaction ID");
-    }
-
-    try {
-        const res = await fetch(`${API_BASE}/payment/binance/verify`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: currentUser, txn_id: txnId })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-            alert(data.message || "Topup successful!");
-            document.getElementById("binance-txn-id").value = "";
-            fetchUserData();
-        } else {
-            alert(data.detail || "Payment verification failed!");
-        }
-    } catch (err) {
-        alert("Failed to connect to backend server");
-    }
+    const res = await fetch(`${API_BASE}/admin/topup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, amount })
+    });
+    if (res.ok) { alert("Added!"); loadAdminUsers(); }
 }

@@ -3,22 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Key Generator Dashboard</title>
+    <title>VIP Key Panel & Mod Manager</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- Auth Screen -->
     <div id="login-screen" class="card">
         <h2 id="auth-title">Welcome Back</h2>
         <p class="subtitle" id="auth-subtitle">Please sign in to access your dashboard.</p>
 
         <div class="form-group">
             <label>Username</label>
-            <input type="text" id="login-username" placeholder="Enter your username">
+            <input type="text" id="login-username" placeholder="Enter username">
         </div>
         <div class="form-group">
             <label>Password</label>
             <input type="password" id="login-password" placeholder="••••••••">
+        </div>
+        <div id="referral-group" class="form-group hidden">
+            <label>Referral Code (Optional)</label>
+            <input type="text" id="login-referral" placeholder="Referral Code">
         </div>
 
         <button id="auth-btn" class="btn btn-primary" onclick="handleAuth()">Sign In</button>
@@ -29,10 +34,11 @@
         </p>
     </div>
 
+    <!-- Dashboard Screen -->
     <div id="dashboard-screen" class="hidden">
         <div class="header-card">
             <div>
-                <span class="reseller-label">Reseller Dashboard</span>
+                <span class="reseller-label" id="role-badge">Reseller Dashboard</span>
                 <h3 id="user-display">Dashboard</h3>
             </div>
             <div class="balance-box">
@@ -42,15 +48,16 @@
             </div>
         </div>
 
+        <!-- Navigation Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('generator')">KEY GENERATOR</button>
             <button class="tab-btn tab-btn-topup" onclick="switchTab('topup')">TOP UP</button>
-            <button class="tab-btn" onclick="switchTab('downloads')">DOWNLOADS</button>
-            <button class="tab-btn" onclick="switchTab('tutorials')">TUTORIALS</button>
             <button class="tab-btn" onclick="switchTab('keys')">LICENSE KEYS</button>
-            <button id="admin-tab-btn" class="tab-btn tab-btn-admin" onclick="switchTab('admin')">ADMIN</button>
+            <button class="tab-btn" onclick="switchTab('settings')">SETTINGS</button>
+            <button id="admin-tab-btn" class="tab-btn tab-btn-admin" onclick="switchTab('admin')">ADMIN PANEL</button>
         </div>
     
+        <!-- Generator Tab -->
         <div id="tab-generator" class="tab-content card">
             <h4>Key Generator</h4>
             <div class="form-group">
@@ -58,7 +65,7 @@
                 <select id="product-select" onchange="updatePlans()"></select>
             </div>
             <div class="form-group">
-                <label>Subscription type</label>
+                <label>Subscription Plan</label>
                 <select id="plan-select"></select>
             </div>
             <div class="form-group">
@@ -68,90 +75,125 @@
             <button class="btn btn-primary" onclick="generateKeys()">Generate Keys</button>
 
             <div id="result-box" class="hidden">
-                <h5>Generated Keys:</h5>
+                <h5 class="subheading">Generated Keys:</h5>
                 <textarea id="key-output" readonly rows="4"></textarea>
             </div>
         </div>
 
+        <!-- Top Up Tab -->
         <div id="tab-topup" class="tab-content card hidden">
-            <h4 class="title-cyan">Top Up Balance (Binance Pay / USDT)</h4>
-            
+            <h4 class="title-cyan">Top Up Balance (Binance Pay)</h4>
             <div class="payment-box">
-                <h5 class="title-blue">Step 1: Send USDT</h5>
-                
-                <img src="qr-code.png" alt="Binance QR Code" class="qr-image" onerror="this.style.display='none'">
-                
+                <h5 class="title-blue">Step 1: Pay via Binance</h5>
                 <div class="payment-details">
                     <p>🔹 <strong>Binance Pay ID:</strong> <span class="pay-id-text">934045195</span></p>
-                    <p>🔹 <strong>BNB Smart Chain Address:</strong></p>
-                    <input type="text" class="copy-input" value="0x02eebc3c83843241dfa4d7c484c74ef54033404b" readonly onclick="this.select(); document.execCommand('copy'); alert('Address Copied!');">
                 </div>
             </div>
-
             <div class="step-two-container">
-                <h5 class="subheading">Step 2: Enter Txn ID to Verify</h5>
+                <h5 class="subheading">Step 2: Enter Transaction ID</h5>
                 <div class="form-group">
-                    <label>Binance Transaction ID / Order ID</label>
-                    <input type="text" id="binance-txn-id" placeholder="e.g. 214829302194">
+                    <input type="text" id="binance-txn-id" placeholder="Transaction ID">
                 </div>
-
-                <button class="btn btn-cyan" onclick="verifyBinancePayment()">Verify & Add Balance</button>
+                <button class="btn btn-cyan" onclick="verifyBinancePayment()">Verify Payment</button>
             </div>
         </div>
 
-        <div id="tab-downloads" class="tab-content card hidden">
-            <h4>Downloads</h4>
-            <p>No downloads available at the moment.</p>
-        </div>
-
-        <div id="tab-tutorials" class="tab-content card hidden">
-            <h4>Tutorials</h4>
-            <p>Select a product to view its tutorial.</p>
-        </div>
-
+        <!-- License Keys History -->
         <div id="tab-keys" class="tab-content card hidden">
-            <h4>Generated License Keys</h4>
+            <h4>Generated Keys History</h4>
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>Product</th>
                         <th>Plan</th>
-                        <th>License Key</th>
+                        <th>Key Code</th>
                         <th>Date</th>
                     </tr>
                 </thead>
                 <tbody id="history-table-body">
-                    <tr><td colspan="4">No license keys generated yet.</td></tr>
+                    <tr><td colspan="4">Loading keys...</td></tr>
                 </tbody>
             </table>
         </div>
 
-        <div id="tab-admin" class="tab-content card hidden">
-            <h4 class="title-red">Admin Control Panel</h4>
+        <!-- User Settings Tab -->
+        <div id="tab-settings" class="tab-content card hidden">
+            <h4 class="title-blue">Account Settings</h4>
             <div class="admin-box">
-                <h5 class="title-blue">Add Balance to Reseller</h5>
+                <h5 class="subheading">Update Password</h5>
                 <div class="form-group">
-                    <label>Reseller Username</label>
+                    <label>Old Password</label>
+                    <input type="password" id="old-pass" placeholder="Old Password">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="new-pass" placeholder="New Password">
+                </div>
+                <button class="btn btn-primary" onclick="updatePassword()">Update Password</button>
+            </div>
+        </div>
+
+        <!-- Admin Control Panel -->
+        <div id="tab-admin" class="tab-content card hidden">
+            <h4 class="title-red">Owner & Admin Management</h4>
+            
+            <!-- Mod App Remote Control -->
+            <div class="admin-box">
+                <h5 class="title-blue">Online Mod Menu Control</h5>
+                <div class="form-group">
+                    <label>Mod App Name</label>
+                    <input type="text" id="mod-name-input" value="VIP MOD MENU">
+                </div>
+                <div class="form-group">
+                    <label>Mod Status</label>
+                    <select id="mod-status-select">
+                        <option value="SAFE">SAFE (Undetected)</option>
+                        <option value="TESTING">TESTING</option>
+                        <option value="RISKY">RISKY (Use Risk)</option>
+                    </select>
+                </div>
+                <div class="checkbox-grid">
+                    <label><input type="checkbox" id="check-maintenance"> Maintenance Mode</label>
+                    <label><input type="checkbox" id="check-esp" checked> ESP Line/Box</label>
+                    <label><input type="checkbox" id="check-aimbot" checked> Aimbot Lock</label>
+                    <label><input type="checkbox" id="check-bullet" checked> Bullet Tracking</label>
+                    <label><input type="checkbox" id="check-memory" checked> Memory Hacks</label>
+                </div>
+                <button class="btn btn-cyan" onclick="saveModConfig()">Save Mod Settings</button>
+            </div>
+
+            <!-- Key Cleanup Panel -->
+            <div class="admin-box">
+                <h5 class="title-blue">Key Management Tools</h5>
+                <div class="btn-group">
+                    <button class="btn btn-danger" onclick="cleanKeys('expired')">Delete Expired Keys</button>
+                    <button class="btn btn-danger" onclick="cleanKeys('unused')">Delete Unused Keys</button>
+                </div>
+            </div>
+
+            <!-- Reseller Balance Topup -->
+            <div class="admin-box">
+                <h5 class="title-blue">Add Credit to Reseller</h5>
+                <div class="form-group">
                     <input type="text" id="admin-topup-user" placeholder="Target Username">
                 </div>
                 <div class="form-group">
-                    <label>Amount ($)</label>
                     <input type="number" id="admin-topup-amount" value="50">
                 </div>
-                <button class="btn btn-primary" onclick="adminAddBalance()">Add Balance</button>
+                <button class="btn btn-primary" onclick="adminAddBalance()">Topup Balance</button>
             </div>
-            <h5 class="subheading">All Resellers</h5>
+
+            <h5 class="subheading">All Registered Users</h5>
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>User</th>
+                        <th>Role</th>
                         <th>Balance</th>
                     </tr>
                 </thead>
-                <tbody id="admin-users-table">
-                    <tr><td colspan="3">Loading...</td></tr>
-                </tbody>
+                <tbody id="admin-users-table"></tbody>
             </table>
         </div>
     </div>
